@@ -19,9 +19,9 @@ public class QueueConsumer {
     private final UserRepository userRepository;
 
     @KafkaListener(topics = AtesTaskAppConstants.USER_TOPIC_NAME)
-    public void receive(@Payload UserCreated event)  {
-        System.out.println("Got a message");
-        userRepository.saveUser(
-                new User(event.getId(), event.getUsername()));
+    public void receive(@Payload String event)  {
+        System.out.println("Got a message: " + event);
+//        userRepository.saveUser(
+//                new User(event.getId(), event.getUsername()));
     }
 }

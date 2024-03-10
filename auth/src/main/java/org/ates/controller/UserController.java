@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -22,9 +23,12 @@ public class UserController {
     private final UserRepository userRepository;
     private final MessageSender messageSender;
 
-    @PostMapping
+    @PostMapping(path = "/register")
     public @ResponseBody User register(@RequestBody CreateUserRequest request) {
-        var user = User.builder()
+        var user = User
+                .builder()
+                .id("1")
+                .publicId(UUID.randomUUID())
                 .username(request.getUsername())
                 .password(request.getPassword())
                 .build();

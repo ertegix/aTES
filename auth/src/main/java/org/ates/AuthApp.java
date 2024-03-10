@@ -1,13 +1,11 @@
-package org.ates.tasktracker;
-
+package org.ates;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Application {
-
+public class AuthApp {
     public static void main(String[] args) {
-        SpringApplication.run(Application.class);
+        SpringApplication.run(AuthApp.class);
     }
 }
