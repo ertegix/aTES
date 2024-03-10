@@ -1,0 +1,26 @@
+{
+     "type": "record",
+     "namespace": "org.ates.event",
+     "name": "UserCreated",
+     "version": "1",
+     "fields": [
+        { "name": "publicId",
+          "type": {
+            "type": "string",
+            "avro.java.string": "String"
+          }
+        },
+        { "name": "username",
+          "type": {
+            "type": "string",
+            "avro.java.string": "String"
+          }
+        },
+        { "name": "role",
+          "type": {
+            "type": "string",
+            "avro.java.string": "String"
+          }
+        }
+     ]
+}

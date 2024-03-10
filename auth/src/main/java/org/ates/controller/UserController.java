@@ -8,6 +8,7 @@ import org.ates.model.CreateUserRequest;
 import org.ates.model.User;
 import org.ates.queue.MessageSender;
 import org.ates.repository.UserRepository;
+import org.ates.util.IdGenerator;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,8 @@ import java.util.UUID;
 @RequestMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
+    private final IdGenerator idGenerator = new IdGenerator();
+
     private final UserRepository userRepository;
     private final MessageSender messageSender;
 
@@ -27,7 +30,7 @@ public class UserController {
     public @ResponseBody User register(@RequestBody CreateUserRequest request) {
         var user = User
                 .builder()
-                .id("1")
+                .id(idGenerator.getNext())
                 .publicId(UUID.randomUUID())
                 .username(request.getUsername())
                 .password(request.getPassword())
@@ -36,9 +39,9 @@ public class UserController {
         var registeredUser = userRepository.saveAndFlush(user);
 
         var event = new UserCreated(
-                registeredUser.getId(),
+                registeredUser.getPublicId().toString(),
                 registeredUser.getUsername(),
-                ""
+                registeredUser.getRole()
         );
         messageSender.sendMessage(event, AtesAuthAppConstants.USER_TOPIC_NAME);
         return registeredUser;

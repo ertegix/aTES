@@ -23,3 +23,10 @@ spring:
     consumer:
       group-id: reader-ates-auth
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+    properties:
+      "[schema.registry.url]": http://localhost:9095
+      "[auto.register.schemas]": true
