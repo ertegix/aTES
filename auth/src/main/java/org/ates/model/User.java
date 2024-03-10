@@ -17,10 +17,11 @@ import java.util.UUID;
 public class User {
 
     @Id
-    private String id;
+    private Long id;
     private UUID publicId;
     private String username;
     private String fullName;
     private String password;
+    private String role;
 
 }
