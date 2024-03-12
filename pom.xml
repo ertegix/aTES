@@ -19,6 +19,7 @@
         <module>auth</module>
         <module>task_tracker</module>
         <module>event-schema-registry</module>
+        <module>accounting</module>
     </modules>
 
     <build>
