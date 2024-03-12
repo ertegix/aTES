@@ -1,6 +1,6 @@
 {
      "type": "record",
-     "namespace": "org.ates.tasktracker.event",
+     "namespace": "ru.ertegix.ates.event",
      "name": "TaskEventV1",
      "version": "1",
      "fields": [

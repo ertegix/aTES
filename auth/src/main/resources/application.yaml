@@ -10,9 +10,6 @@ spring:
     driverClassName: org.h2.Driver
     username: sa
     password: password
-  flyway:
-    locations: classpath:db/migration
-    table: flyway_schema_history
   data:
     jpa:
       database-platform: org.hibernate.dialect.H2Dialect

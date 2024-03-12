@@ -2,22 +2,6 @@ server:
   port: 8078
 
 spring:
-  h2:
-    console:
-      enabled: true
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
-  flyway:
-    locations: classpath:db/migration
-    table: flyway_schema_history
-  data:
-    jpa:
-      database-platform: org.hibernate.dialect.H2Dialect
-      repositories:
-        bootstrap-mode: default
   kafka:
     bootstrap-servers: localhost:29092
     consumer:
@@ -29,4 +13,5 @@ spring:
       value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
     properties:
       "[schema.registry.url]": http://localhost:9095
-      "[auto.register.schemas]": true
+      "[specific.avro.reader]": true
+      "[auto.register.schemas]": false

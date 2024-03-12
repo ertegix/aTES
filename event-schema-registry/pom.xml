@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
+    <groupId>ru.ertegix.ates</groupId>
     <artifactId>event-schema-registry</artifactId>
     <version>1.0-SNAPSHOT</version>
 
@@ -65,7 +65,7 @@
                         <param>http://localhost:9095</param>
                     </schemaRegistryUrls>
                     <subjects>
-                        <users-value>${project.basedir}/src/main/resources/avro/user_created_event.avsc</users-value>
+                        <users-value>${project.basedir}/src/main/resources/avro/user_event_v1.avsc</users-value>
                         <tasks-value>${project.basedir}/src/main/resources/avro/task_event_v1.avsc</tasks-value>
                     </subjects>
                 </configuration>

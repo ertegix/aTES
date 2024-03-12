@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>org.example</groupId>
+    <groupId>ru.ertegix.ates</groupId>
     <artifactId>task_tracker</artifactId>
     <version>1.0-SNAPSHOT</version>
 
@@ -75,7 +75,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.example</groupId>
+            <groupId>ru.ertegix.ates</groupId>
             <artifactId>event-schema-registry</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
