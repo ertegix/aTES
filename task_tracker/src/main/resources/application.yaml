@@ -1,6 +1,10 @@
 server:
   port: 8078
 
+jwt:
+  token:
+    secret: popugi
+
 spring:
   kafka:
     bootstrap-servers: localhost:29092

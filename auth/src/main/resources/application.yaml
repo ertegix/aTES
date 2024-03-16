@@ -1,6 +1,10 @@
 server:
   port: 8077
 
+jwt:
+  token:
+    secret: popugi
+
 spring:
   h2:
     console:
