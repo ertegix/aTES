@@ -1,18 +1,20 @@
-package ru.ertegix.ates.tasktracker.model;
+package ru.ertegix.ates.accounting.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.ertegix.ates.common.Role;
 
 import javax.persistence.*;
 import java.util.UUID;
 
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Setter
-@Entity
+@Getter
 @Table(name = "USER")
+@Entity
 public class User {
 
     @Id

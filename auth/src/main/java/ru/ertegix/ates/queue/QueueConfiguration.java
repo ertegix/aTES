@@ -10,6 +10,6 @@ public class QueueConfiguration {
 
     @Bean
     public NewTopic usersStreamTopic() {
-        return new NewTopic(AtesAuthAppConstants.USER_TOPIC_NAME, 1, (short) 1);
+        return new NewTopic(AtesAuthAppConstants.USER_CUD_TOPIC_NAME, 1, (short) 1);
     }
 }
