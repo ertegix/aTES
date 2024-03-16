@@ -1,18 +1,17 @@
 package ru.ertegix.ates.tasktracker.repo;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import ru.ertegix.ates.tasktracker.model.Status;
 import ru.ertegix.ates.tasktracker.model.Task;
-import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class TaskRepository {
+@Repository
+public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    private final List<Task> tasks = new ArrayList<>();
+    @Override
+    List<Task> findAll();
 
-    public List<Task> getAll() {
-        return tasks;
-    }
-
+    List<Task> findAllByStatus(Status status);
 }

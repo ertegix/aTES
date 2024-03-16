@@ -65,8 +65,9 @@
                         <param>http://localhost:9095</param>
                     </schemaRegistryUrls>
                     <subjects>
-                        <users-value>${project.basedir}/src/main/resources/avro/user_event_v1.avsc</users-value>
-                        <tasks-value>${project.basedir}/src/main/resources/avro/task_event_v1.avsc</tasks-value>
+                        <users-stream-value>${project.basedir}/src/main/resources/avro/user/user_event_v1.avsc</users-stream-value>
+                        <tasks-stream-value>${project.basedir}/src/main/resources/avro/task/cud/task_event_v1.avsc</tasks-stream-value>
+                        <tasks-value>${project.basedir}/src/main/resources/avro/task/be/task_lifecycle_v1.avsc</tasks-value>
                     </subjects>
                 </configuration>
                 <goals>

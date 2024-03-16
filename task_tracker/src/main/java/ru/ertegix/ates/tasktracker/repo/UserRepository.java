@@ -1,30 +1,23 @@
 package ru.ertegix.ates.tasktracker.repo;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import ru.ertegix.ates.common.Role;
 import ru.ertegix.ates.tasktracker.model.User;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Component
-public class UserRepository {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    private final static Object lock = new Object();
+    List<User> findAllByRole(Role role);
 
-    private final Map<String, User> users = new HashMap<>();
+    @Query(nativeQuery = true,
+            value = "SELECT * FROM USER WHERE random()")
+    User getRandomUser();
 
-    public void saveUser(User user) {
-        synchronized (lock) {
-            if (users.entrySet().size() > 5) {
-                throw new RuntimeException("Too many users");
-            }
-            if (user != null) {
-                users.put(user.getUsername(), user);
-            }
-        }
-    }
-
-    public User get(String username) {
-        return users.get(username);
-    }
+    Optional<User> findByPublicId(UUID fromString);
 }
