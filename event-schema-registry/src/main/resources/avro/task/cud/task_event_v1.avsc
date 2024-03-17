@@ -1,15 +1,9 @@
 {
      "type": "record",
      "namespace": "ru.ertegix.ates.event",
-     "name": "TaskEventV1",
+     "name": "TaskEvent_v1",
      "version": "1",
      "fields": [
-        { "name": "eventType",
-          "type": {
-            "type": "string",
-            "avro.java.string": "String"
-          }
-        },
         { "name": "publicId",
           "type": {
             "type": "string",
@@ -22,18 +16,11 @@
             "avro.java.string": "String"
           }
         },
-        { "name": "assigneeId",
-          "type": "string",
-          "logicalType": "UUID"
-        },
-        { "name": "fee",
-          "type": "long"
-        },
-        { "name": "reward",
-          "type": "long"
-        },
-        { "name": "completed",
-          "type": "boolean"
+        { "name": "userPublicId",
+          "type": {
+            "type": "string",
+            "avro.java.string": "String"
+          }
         }
      ]
 }

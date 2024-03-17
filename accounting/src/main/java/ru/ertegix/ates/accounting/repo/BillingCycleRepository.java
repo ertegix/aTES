@@ -14,6 +14,8 @@ public interface BillingCycleRepository extends JpaRepository<BillingCycle, Long
 
     List<BillingCycle> findAllByUserPublicId(UUID userPublicId);
 
+    List<BillingCycle> findAllByClosed(Boolean closed);
+
     @Query(value = "select b from BillingCycle b where b.userPublicId = :userPublicId" +
             " and b.startDate <= :date and b.endDate >= :date")
     Optional<BillingCycle> findActualByUserPublicId(

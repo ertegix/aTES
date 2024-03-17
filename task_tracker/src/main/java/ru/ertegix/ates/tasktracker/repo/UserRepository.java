@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByRole(Role role);
 
     @Query(nativeQuery = true,
-            value = "SELECT * FROM USER WHERE random()")
+            value = "SELECT * FROM USER WHERE random()  limit 1")
     User getRandomUser();
 
     Optional<User> findByPublicId(UUID fromString);

@@ -6,6 +6,8 @@ import ru.ertegix.ates.tasktracker.model.Status;
 import ru.ertegix.ates.tasktracker.model.Task;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
@@ -14,4 +16,9 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findAll();
 
     List<Task> findAllByStatus(Status status);
+
+    List<Task> findAllByUserPublicId(UUID userPublicId);
+
+    Optional<Task> findByTaskPublicId(UUID taskPublicId);
+
 }

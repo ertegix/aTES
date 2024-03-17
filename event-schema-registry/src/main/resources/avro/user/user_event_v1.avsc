@@ -1,0 +1,17 @@
+{
+     "type": "record",
+     "namespace": "ru.ertegix.ates.event",
+     "name": "UserEvent_v1",
+     "version": "1",
+     "fields": [
+        { "name": "publicId",
+          "type": "string"
+        },
+        { "name": "username",
+          "type": "string"
+        },
+        { "name": "role",
+          "type": "string"
+        }
+     ]
+}

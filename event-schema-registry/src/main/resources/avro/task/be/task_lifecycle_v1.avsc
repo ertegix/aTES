@@ -1,22 +1,28 @@
 {
      "type": "record",
-     "namespace": "ru.ertegix.ates",
-     "name": "UserEvent",
+     "namespace": "ru.ertegix.ates.event",
+     "name": "TaskBusinessEvent_v1",
      "version": "1",
      "fields": [
+       { "name": "eventType",
+         "type": {
+           "type": "string",
+           "avro.java.string": "String"
+         }
+       },
         { "name": "publicId",
           "type": {
             "type": "string",
             "avro.java.string": "String"
           }
         },
-        { "name": "username",
+        { "name": "description",
           "type": {
             "type": "string",
             "avro.java.string": "String"
           }
         },
-        { "name": "role",
+        { "name": "userPublicId",
           "type": {
             "type": "string",
             "avro.java.string": "String"

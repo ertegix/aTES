@@ -1,6 +1,5 @@
 package ru.ertegix.ates.accounting.dto;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import ru.ertegix.ates.accounting.model.Transaction;
@@ -18,8 +17,8 @@ public class TransactionDto {
 
     public TransactionDto(Transaction transaction) {
         this.userPublicId = transaction.getUserPublicId();
-        this.debit = transaction.getDebit();
-        this.credit = transaction.getCredit();
+        this.debit = transaction.getIncome();
+        this.credit = transaction.getOutcome();
         this.billingCycleId = transaction.getBillingCycle().getId();
     }
 }

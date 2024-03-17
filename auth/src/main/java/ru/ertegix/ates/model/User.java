@@ -22,4 +22,11 @@ public class User {
     private String username;
     private String password;
     private String role;
+
+    public User(UUID publicId, String username, String password, String role) {
+        this.publicId = publicId;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
 }

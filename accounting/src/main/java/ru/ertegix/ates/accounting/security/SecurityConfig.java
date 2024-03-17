@@ -1,26 +1,21 @@
-package ru.ertegix.ates.security;
+package ru.ertegix.ates.accounting.security;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import ru.ertegix.ates.model.User;
-import ru.ertegix.ates.repository.UserRepository;
-import ru.ertegix.ates.security.jwt.JwtTokenFilter;
-
-import javax.annotation.PostConstruct;
-import java.util.UUID;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenFilter jwtTokenFilter;
-    private final UserRepository userRepository;
 
     @Bean
     @Override
@@ -38,25 +33,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .headers().frameOptions().disable()
                 .and()
                 .authorizeRequests()
-                .antMatchers(
-                        "/auth/login"
-                        ,"/users/register"
-                )
-                .permitAll()
-//                .anyRequest().authenticated()
+                .anyRequest()
+                .authenticated()
                 .and()
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
-    }
-
-    @PostConstruct
-    public void addAdmin() {
-        User user = new User(
-                UUID.randomUUID(),
-                "admin",
-                "$2a$10$D68jwZ8.7m1ynIZmTDiZ2ePPzQldzjF/IzGqlfvnFvPbVpwkLhKL6",
-                "ADMIN"
-        );
-
-        userRepository.saveAndFlush(user);
     }
 }

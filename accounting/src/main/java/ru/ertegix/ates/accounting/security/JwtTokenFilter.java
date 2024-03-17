@@ -1,6 +1,7 @@
-package ru.ertegix.ates.security.jwt;
+package ru.ertegix.ates.accounting.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
@@ -23,13 +24,8 @@ public class JwtTokenFilter extends GenericFilterBean {
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain)
             throws IOException, ServletException {
 
-        var request = (HttpServletRequest) req;
-        if (request.getRequestURI().startsWith("/auth/login")) {
-            filterChain.doFilter(req, res);
-            return;
-        }
-
-        if (request.getRequestURI().startsWith("/users/register")) {
+        // нужно для доступа к консоли H2
+        if (((HttpServletRequest) req).getRequestURI().startsWith("/h2-console")) {
             filterChain.doFilter(req, res);
             return;
         }
@@ -37,7 +33,7 @@ public class JwtTokenFilter extends GenericFilterBean {
         try {
             var token = jwtTokenProvider.resolveToken((HttpServletRequest) req);
             if (jwtTokenProvider.validateToken(token)) {
-                var auth = jwtTokenProvider.getAuthentication(token);
+                Authentication auth = jwtTokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         } catch (Exception e) {
