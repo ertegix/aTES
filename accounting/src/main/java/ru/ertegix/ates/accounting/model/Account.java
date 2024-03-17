@@ -1,16 +1,33 @@
 package ru.ertegix.ates.accounting.model;
 
-import java.math.BigDecimal;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+import javax.persistence.*;
+import java.util.UUID;
+
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table
 public class Account {
 
-    private final BigDecimal balance;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private UUID userPublicId;
+    private Long balance;
 
-    public Account(BigDecimal balance) {
+    public Account(UUID userPublicId, Long balance) {
+        this.userPublicId = userPublicId;
         this.balance = balance;
     }
 
-    public BigDecimal getBalance() {
-        return balance;
+    public void addToBalance(Long value) {
+        this.balance = this.balance + value;
     }
 }

@@ -1,8 +1,8 @@
 {
      "type": "record",
      "namespace": "ru.ertegix.ates.event",
-     "name": "TaskBusinessEvent_v1",
-     "version": "1",
+     "name": "TaskBusinessEvent_v2",
+     "version": "2",
      "fields": [
        { "name": "eventType",
          "type": {
@@ -16,11 +16,18 @@
             "avro.java.string": "String"
           }
         },
+       { "name": "jiraId",
+         "type": {
+           "type": "string",
+           "avro.java.string": "String"
+         }
+       },
         { "name": "description",
           "type": {
             "type": "string",
             "avro.java.string": "String"
-          }        },
+          }
+        },
         { "name": "userPublicId",
           "type": {
             "type": "string",

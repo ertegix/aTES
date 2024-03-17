@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8071
 
 jwt:
   token:
@@ -9,7 +9,7 @@ spring:
   kafka:
     bootstrap-servers: localhost:29092
     consumer:
-      group-id: ates-accounting
+      group-id: ates-analytics
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
     producer:

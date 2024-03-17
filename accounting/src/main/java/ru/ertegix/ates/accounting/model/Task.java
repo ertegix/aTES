@@ -7,16 +7,16 @@ import lombok.Setter;
 import ru.ertegix.ates.common.Status;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.util.Random;
+import java.time.LocalDate;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Setter
 @Getter
 @Table
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "TASK")
+@Entity
 public class Task {
 
     private final static ThreadLocalRandom RANDOMIZER = ThreadLocalRandom.current();
@@ -26,20 +26,36 @@ public class Task {
     private Long id;
     @Column(nullable = false)
     private UUID taskPublicId;
-    @Setter
     @Column(nullable = false)
     private UUID userPublicId;
-    @Setter
     private String description;
-    private Integer assignCost;
-    private Integer completionReward;
+    private String jiraId;
+    private Long assignCost;
+    private Long completionReward;
+    private LocalDate assignedDate;
+    private LocalDate completedDate;
+    private Status status;
 
-    public Task(UUID userPublicId, String description) {
-        this.taskPublicId = UUID.randomUUID();
+    public Task(UUID taskPublicId, UUID userPublicId, String description, Status status) {
+        this.taskPublicId = taskPublicId;
         this.userPublicId = userPublicId;
         this.description = description;
-        this.assignCost = RANDOMIZER.nextInt(10, 20);
-        this.completionReward = RANDOMIZER.nextInt(20, 40);
+        this.assignCost = RANDOMIZER.nextLong(10, 20);
+        this.completionReward = RANDOMIZER.nextLong(20, 40);
+        this.assignedDate = LocalDate.now();
+        this.status = status;
+    }
+
+    public Task(UUID taskPublicId, UUID userPublicId, String description, String jiraId, Status status)
+    {
+        this.taskPublicId = taskPublicId;
+        this.userPublicId = userPublicId;
+        this.description = description;
+        this.assignCost = RANDOMIZER.nextLong(10, 20);
+        this.completionReward = RANDOMIZER.nextLong(20, 40);
+        this.assignedDate = LocalDate.now();
+        this.status = status;
+        this.jiraId = jiraId;
     }
 }
 

@@ -31,7 +31,7 @@ public class AuthenticationController {
             var user = userRepository.getByUsername(username);
 
             if (user == null) {
-                throw new UsernameNotFoundException("User with login: " + username + " not found");
+                throw new UsernameNotFoundException(username);
             }
 
             var token = jwtTokenProvider.createToken(user.getPublicId(), username, user.getRole());
