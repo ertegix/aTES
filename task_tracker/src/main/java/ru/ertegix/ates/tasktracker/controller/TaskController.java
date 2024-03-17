@@ -12,6 +12,7 @@ import ru.ertegix.ates.event.TaskBusinessEvent_v1;
 import ru.ertegix.ates.event.TaskEvent_v1;
 import ru.ertegix.ates.tasktracker.event.TaskBeEventType;
 import ru.ertegix.ates.tasktracker.event.TaskBeEvent_v1;
+import ru.ertegix.ates.tasktracker.event.TaskBeEvent_v2;
 import ru.ertegix.ates.tasktracker.model.Status;
 import ru.ertegix.ates.tasktracker.model.Task;
 import ru.ertegix.ates.tasktracker.model.User;
@@ -28,6 +29,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
@@ -69,10 +71,16 @@ public class TaskController {
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There are no users found");
         }
+
+        String jiraId =  request.getJiraId() == null
+                ? extractJiraId(request.getDescription())
+                : request.getJiraId();
+
         Task task = new Task(
                 user.getPublicId(),
                 request.getDescription(),
-                Status.NOT_DONE
+                Status.NOT_DONE,
+                jiraId
         );
         taskRepository.saveAndFlush(task);
         TaskEvent_v1 taskEvent = new TaskEvent_v1();
@@ -85,6 +93,19 @@ public class TaskController {
                         new ru.ertegix.ates.event.TaskBusinessEvent_v1(
                                 TaskBeEventType.CREATED.name(),
                                 task.getTaskPublicId().toString(),
+                                task.getDescription(),
+                                task.getUserPublicId().toString(),
+                                LocalDateTime.now().toString()
+                        )
+                )
+        );
+
+        messageSender.sendBeMessage(
+                new TaskBeEvent_v2(
+                        new ru.ertegix.ates.event.TaskBusinessEvent_v2(
+                                TaskBeEventType.CREATED.name(),
+                                task.getTaskPublicId().toString(),
+                                task.getJiraId(),
                                 task.getDescription(),
                                 task.getUserPublicId().toString(),
                                 LocalDateTime.now().toString()
@@ -117,6 +138,23 @@ public class TaskController {
                             )
                     )
             );
+
+            String jiraId =  task.getJiraId() == null
+                    ? extractJiraId(task.getDescription())
+                    : task.getJiraId();
+
+            messageSender.sendBeMessage(
+                    new TaskBeEvent_v2(
+                            new ru.ertegix.ates.event.TaskBusinessEvent_v2(
+                                    TaskBeEventType.ASSIGNED.name(),
+                                    task.getTaskPublicId().toString(),
+                                    jiraId,
+                                    task.getDescription(),
+                                    task.getUserPublicId().toString(),
+                                    LocalDateTime.now().toString()
+                            )
+                    )
+            );
         }
     }
 
@@ -141,6 +179,23 @@ public class TaskController {
                             )
                     )
             );
+
+            String jiraId =  foundTask.getJiraId() == null
+                    ? extractJiraId(foundTask.getDescription())
+                    : foundTask.getJiraId();
+
+            messageSender.sendBeMessage(
+                    new TaskBeEvent_v2(
+                            new ru.ertegix.ates.event.TaskBusinessEvent_v2(
+                                    TaskBeEventType.COMPLETED.name(),
+                                    foundTask.getTaskPublicId().toString(),
+                                    jiraId,
+                                    foundTask.getDescription(),
+                                    foundTask.getUserPublicId().toString(),
+                                    LocalDateTime.now().toString()
+                            )
+                    )
+            );
         }
     }
 
@@ -150,6 +205,18 @@ public class TaskController {
     @GetMapping("/allUsers")
     public List<User> users() {
         return userRepository.findAll();
+    }
+
+
+    private String extractJiraId(String description) {
+        boolean matches = Pattern.compile("\\[.+\\].+").matcher(description).matches();
+
+        if (matches) {
+            var ind2 = description.indexOf("]");
+            return description.substring(0, ind2);
+        } else {
+            return description;
+        }
     }
 
 }

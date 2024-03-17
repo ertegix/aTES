@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+@Setter
 @Getter
 @Table
 @NoArgsConstructor
@@ -25,15 +26,13 @@ public class Task {
     private Long id;
     @Column(nullable = false)
     private UUID taskPublicId;
-    @Setter
     @Column(nullable = false)
     private UUID userPublicId;
-    @Setter
     private String description;
+    private String jiraId;
     private Long assignCost;
     private Long completionReward;
     private LocalDate assignedDate;
-    @Setter
     private LocalDate completedDate;
     private Status status;
 
@@ -45,6 +44,18 @@ public class Task {
         this.completionReward = RANDOMIZER.nextLong(20, 40);
         this.assignedDate = LocalDate.now();
         this.status = status;
+    }
+
+    public Task(UUID taskPublicId, UUID userPublicId, String description, String jiraId, Status status)
+    {
+        this.taskPublicId = taskPublicId;
+        this.userPublicId = userPublicId;
+        this.description = description;
+        this.assignCost = RANDOMIZER.nextLong(10, 20);
+        this.completionReward = RANDOMIZER.nextLong(20, 40);
+        this.assignedDate = LocalDate.now();
+        this.status = status;
+        this.jiraId = jiraId;
     }
 }
 

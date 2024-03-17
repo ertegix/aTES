@@ -54,24 +54,26 @@ public class Consumer {
     }
 
     @KafkaListener(topics = TASK_STREAM_TOPIC_NAME)
-    public void receiveTaskEvent(@Payload ru.ertegix.ates.event.TaskEvent_v1 taskEventV1) {
-        log.info("Received task stream event: {}", taskEventV1.getPublicId());
-        Optional<Task> task = taskRepository.findByTaskPublicId(UUID.fromString(taskEventV1.getPublicId()));
+    public void receiveTaskEventStream(@Payload ru.ertegix.ates.event.TaskEvent_v2 event) {
+        log.info("Received task stream event: {}", event.getPublicId());
+        Optional<Task> task = taskRepository.findByTaskPublicId(UUID.fromString(event.getPublicId()));
         if (task.isPresent()) {
             Task taskForUpdate = task.get();
-            taskForUpdate.setDescription(taskEventV1.getDescription());
+            taskForUpdate.setJiraId(event.getJiraId());
+            taskForUpdate.setDescription(event.getDescription());
         } else {
             createTask(
-                    taskEventV1.publicId,
-                    taskEventV1.getUserPublicId(),
-                    taskEventV1.getDescription(),
-                    Status.NOT_DONE
+                    event.publicId,
+                    event.getUserPublicId(),
+                    event.getDescription(),
+                    Status.NOT_DONE,
+                    event.getJiraId()
             );
         }
     }
 
     @KafkaListener(topics = TASK_TOPIC_NAME)
-    public void receiveTaskBusinessEvent(TaskBusinessEvent_v1 eventV1) {
+    public void receiveTaskBusinessEvent_v2(ru.ertegix.ates.event.TaskBusinessEvent_v2 eventV1) {
         createUserIfNotExist(UUID.fromString(eventV1.getUserPublicId()));
         TaskBeEventType eventType = TaskBeEventType.valueOf(eventV1.getEventType());
         switch (eventType) {
@@ -92,9 +94,9 @@ public class Consumer {
         }
     }
 
-    private void receiveTaskCreated(TaskBusinessEvent_v1 taskEventV1) {
-        log.info("Received task created: {}", taskEventV1.getPublicId());
-        Optional<Task> task = taskRepository.findByTaskPublicId(UUID.fromString(taskEventV1.getPublicId()));
+    private void receiveTaskCreated(ru.ertegix.ates.event.TaskBusinessEvent_v2 event) {
+        log.info("Received task created: {}", event.getPublicId());
+        Optional<Task> task = taskRepository.findByTaskPublicId(UUID.fromString(event.getPublicId()));
         if (task.isPresent()) {
             addTransactionToUsersAccount(
                     task.get().getUserPublicId(),
@@ -102,10 +104,11 @@ public class Consumer {
                     false);
         } else {
             Task newTask = createTask(
-                    taskEventV1.publicId,
-                    taskEventV1.getUserPublicId(),
-                    taskEventV1.getDescription(),
-                    Status.NOT_DONE
+                    event.publicId,
+                    event.getUserPublicId(),
+                    event.getDescription(),
+                    Status.NOT_DONE,
+                    event.getJiraId()
             );
 
             addTransactionToUsersAccount(
@@ -116,22 +119,24 @@ public class Consumer {
         }
     }
 
-    private void receiveTaskAssigned(TaskBusinessEvent_v1 taskEventV1) {
-        log.info("Received task assigned: {}", taskEventV1.getPublicId());
+    private void receiveTaskAssigned(ru.ertegix.ates.event.TaskBusinessEvent_v2 event) {
+        log.info("Received task assigned: {}", event.getPublicId());
         Optional<Task> task = taskRepository.findByTaskPublicId(
-                UUID.fromString(taskEventV1.getPublicId())
+                UUID.fromString(event.getPublicId())
         );
 
         if (task.isPresent()) {
             Task taskForUpdate = task.get();
-            taskForUpdate.setUserPublicId(UUID.fromString(taskEventV1.getUserPublicId()));
+            taskForUpdate.setUserPublicId(UUID.fromString(event.getUserPublicId()));
+            taskForUpdate.setJiraId(event.getJiraId());
             addTransactionToUsersAccount(task.get().getUserPublicId(), task.get(), false);
         } else {
             Task newTask = createTask(
-                    taskEventV1.publicId,
-                    taskEventV1.getUserPublicId(),
+                    event.publicId,
+                    event.getUserPublicId(),
                     "NOT PRESENT YET",
-                    Status.NOT_DONE
+                    Status.NOT_DONE,
+                    event.getJiraId()
             );
 
             addTransactionToUsersAccount(
@@ -142,23 +147,24 @@ public class Consumer {
         }
     }
 
-    private void receiveTaskCompleted(TaskBusinessEvent_v1 taskEventV1) {
-        log.info("Received task completed: {}", taskEventV1.getPublicId());
+    private void receiveTaskCompleted(ru.ertegix.ates.event.TaskBusinessEvent_v2 event) {
+        log.info("Received task completed: {}", event.getPublicId());
         Optional<Task> task = taskRepository.findByTaskPublicId(
-                UUID.fromString(taskEventV1.getPublicId())
+                UUID.fromString(event.getPublicId())
         );
 
         if (task.isPresent()) {
             Task taskForUpdate = task.get();
-            taskForUpdate.setUserPublicId(UUID.fromString(taskEventV1.getUserPublicId()));
+            taskForUpdate.setUserPublicId(UUID.fromString(event.getUserPublicId()));
             taskForUpdate.setCompletedDate(LocalDate.now());
             addTransactionToUsersAccount(task.get().getUserPublicId(), task.get(), true);
         } else {
             Task newTask = createTask(
-                    taskEventV1.publicId,
-                    taskEventV1.getUserPublicId(),
+                    event.publicId,
+                    event.getUserPublicId(),
                     "NOT PRESENT YET",
-                    Status.DONE
+                    Status.DONE,
+                    event.getJiraId()
             );
 
             addTransactionToUsersAccount(
@@ -171,11 +177,15 @@ public class Consumer {
 
 
     private Task createTask(String taskPublicId, String userPublicId, String description,
-                            Status status) {
+                            Status status, String jiraId)
+    {
+
+
         Task task = new Task(
                 UUID.fromString(taskPublicId),
                 UUID.fromString(userPublicId),
                 description,
+                jiraId,
                 status);
         taskRepository.saveAndFlush(task);
         messageSender.sendPrice(new PricesEvent_v1(

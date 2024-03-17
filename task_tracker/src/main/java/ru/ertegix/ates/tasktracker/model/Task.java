@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Getter
 @Setter
@@ -27,10 +28,21 @@ public class Task {
     private String description;
     private Status status;
 
+    private String jiraId;
+
     public Task(UUID userPublicId, String description, Status status) {
         this.taskPublicId = UUID.randomUUID();
         this.userPublicId = userPublicId;
         this.description = description;
         this.status = status;
+        this.jiraId = null;
+    }
+
+    public Task(UUID userPublicId, String description, Status status, String jiraId) {
+        this.taskPublicId = UUID.randomUUID();
+        this.userPublicId = userPublicId;
+        this.description = description;
+        this.status = status;
+        this.jiraId = jiraId;
     }
 }

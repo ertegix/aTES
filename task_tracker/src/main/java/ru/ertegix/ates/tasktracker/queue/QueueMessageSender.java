@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import ru.ertegix.ates.tasktracker.event.TaskBeEvent_v1;
+import ru.ertegix.ates.tasktracker.event.TaskBeEvent_v2;
 
 import java.util.UUID;
 
@@ -24,6 +25,14 @@ public class QueueMessageSender {
     }
 
     public <T> void sendBeMessage(TaskBeEvent_v1 event) {
+        log.info("sending BE message: {}", event);
+        kafkaTemplate.send(
+                TopicsNames.TASK_TOPIC_NAME,
+                UUID.randomUUID().toString(),
+                event.getContent());
+    }
+
+    public <T> void sendBeMessage(TaskBeEvent_v2 event) {
         log.info("sending BE message: {}", event);
         kafkaTemplate.send(
                 TopicsNames.TASK_TOPIC_NAME,
