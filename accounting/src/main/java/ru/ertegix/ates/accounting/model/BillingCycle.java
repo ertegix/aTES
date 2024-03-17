@@ -25,6 +25,7 @@ public class BillingCycle implements Serializable {
     private UUID userPublicId;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Boolean closed = false;
     @OneToMany(mappedBy = "billingCycle", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private final List<Transaction> transactions = new ArrayList<>();
 
@@ -32,5 +33,27 @@ public class BillingCycle implements Serializable {
         this.userPublicId = userPublicId;
         this.startDate = LocalDate.now();
         this.endDate = startDate.plusDays(period.getDays());
+    }
+
+    public void close() {
+        this.closed = true;
+    }
+
+    public boolean isEnded() {
+        LocalDate today = LocalDate.now();
+        return (!startDate.isBefore(today) && !startDate.isEqual(today))
+                || (!endDate.isAfter(today) && !endDate.isEqual(today));
+    }
+
+    public int processTransactions() {
+        int totalIncome = 0;
+        int totalOutcome = 0;
+
+        for (Transaction t: transactions) {
+            totalOutcome+=t.getOutcome();
+            totalIncome+=t.getIncome();
+        }
+
+        return totalIncome - totalOutcome;
     }
 }

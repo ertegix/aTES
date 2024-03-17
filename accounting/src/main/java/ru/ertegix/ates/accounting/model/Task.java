@@ -7,8 +7,7 @@ import lombok.Setter;
 import ru.ertegix.ates.common.Status;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.util.Random;
+import java.time.LocalDate;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -16,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @Table
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "TASK")
+@Entity
 public class Task {
 
     private final static ThreadLocalRandom RANDOMIZER = ThreadLocalRandom.current();
@@ -33,13 +32,19 @@ public class Task {
     private String description;
     private Integer assignCost;
     private Integer completionReward;
+    private LocalDate assignedDate;
+    @Setter
+    private LocalDate completedDate;
+    private Status status;
 
-    public Task(UUID userPublicId, String description) {
-        this.taskPublicId = UUID.randomUUID();
+    public Task(UUID taskPublicId, UUID userPublicId, String description, Status status) {
+        this.taskPublicId = taskPublicId;
         this.userPublicId = userPublicId;
         this.description = description;
         this.assignCost = RANDOMIZER.nextInt(10, 20);
         this.completionReward = RANDOMIZER.nextInt(20, 40);
+        this.assignedDate = LocalDate.now();
+        this.status = status;
     }
 }
 

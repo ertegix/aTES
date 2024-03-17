@@ -20,14 +20,18 @@ public class Transaction {
     private UUID userPublicId;
     @ManyToOne
     private BillingCycle billingCycle;
-    private Integer debit;
-    private Integer credit;
+    private Integer income;
+    private Integer outcome;
+    @Enumerated(value = EnumType.STRING)
+    private TransactionType type;
 
-    public Transaction(UUID userPublicId, BillingCycle billingCycle, Integer debit, Integer credit) {
+    public Transaction(UUID userPublicId, BillingCycle billingCycle, Integer income, Integer credit, TransactionType type)
+    {
         this.userPublicId = userPublicId;
         this.billingCycle = billingCycle;
-        this.debit = debit;
-        this.credit = credit;
+        this.income = income;
+        this.outcome = credit;
+        this.type = type;
     }
 
 
@@ -36,7 +40,8 @@ public class Transaction {
                 task.getUserPublicId(),
                 billingCycle,
                 task.getCompletionReward(),
-                0
+                0,
+                TransactionType.INCOME
         );
     }
 
@@ -45,7 +50,8 @@ public class Transaction {
                 task.getUserPublicId(),
                 billingCycle,
                 0,
-                task.getAssignCost()
+                task.getAssignCost(),
+                TransactionType.OUTCOME
                 );
     }
 }

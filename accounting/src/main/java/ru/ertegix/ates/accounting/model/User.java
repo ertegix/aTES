@@ -25,6 +25,7 @@ public class User {
     private String username;
     @Enumerated(value = EnumType.STRING)
     private Role role;
+    private int balance;
 
     public User(UUID publicId, String username, Role role) {
         this.publicId = publicId;
