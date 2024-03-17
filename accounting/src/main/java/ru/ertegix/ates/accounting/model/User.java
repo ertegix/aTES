@@ -25,11 +25,19 @@ public class User {
     private String username;
     @Enumerated(value = EnumType.STRING)
     private Role role;
-    private int balance;
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Account account;
 
     public User(UUID publicId, String username, Role role) {
         this.publicId = publicId;
         this.username = username;
         this.role = role;
+        this.account = new Account(publicId, 0L);
+    }
+
+    public void addToBalance(Long value) {
+        if (this.account != null) {
+            this.account.addToBalance(value);
+        }
     }
 }

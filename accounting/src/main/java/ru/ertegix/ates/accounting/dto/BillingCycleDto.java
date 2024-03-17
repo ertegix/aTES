@@ -14,13 +14,13 @@ import java.util.stream.Collectors;
 @Getter
 public class BillingCycleDto {
 
-    private UUID userPublicId;
+    private Long accountId;
     private LocalDate startDate;
     private LocalDate endDate;
     private List<TransactionDto> transactions = new ArrayList<>();
 
     public BillingCycleDto(BillingCycle billingCycle) {
-        this.userPublicId = billingCycle.getUserPublicId();
+        this.accountId = billingCycle.getAccountId();
         this.startDate = billingCycle.getStartDate();
         this.endDate = billingCycle.getEndDate();
         this.transactions = billingCycle.getTransactions()

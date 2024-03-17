@@ -30,8 +30,8 @@ public class Task {
     private UUID userPublicId;
     @Setter
     private String description;
-    private Integer assignCost;
-    private Integer completionReward;
+    private Long assignCost;
+    private Long completionReward;
     private LocalDate assignedDate;
     @Setter
     private LocalDate completedDate;
@@ -41,8 +41,8 @@ public class Task {
         this.taskPublicId = taskPublicId;
         this.userPublicId = userPublicId;
         this.description = description;
-        this.assignCost = RANDOMIZER.nextInt(10, 20);
-        this.completionReward = RANDOMIZER.nextInt(20, 40);
+        this.assignCost = RANDOMIZER.nextLong(10, 20);
+        this.completionReward = RANDOMIZER.nextLong(20, 40);
         this.assignedDate = LocalDate.now();
         this.status = status;
     }

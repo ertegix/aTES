@@ -1,8 +1,12 @@
 package ru.ertegix.ates.accounting.model;
 
-import javax.persistence.*;
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
+
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "PAYMENT")
 public class Payment {
@@ -12,12 +16,12 @@ public class Payment {
     public Long id;
 
     private Long billingCycleId;
-    private UUID userPublicId;
-    private Integer amount;
+    private Long accountId;
+    private Long amount;
 
-    public Payment(Long billingCycleId, UUID userPublicId, Integer amount) {
+    public Payment(Long billingCycleId, Long accountId, Long amount) {
         this.billingCycleId = billingCycleId;
-        this.userPublicId = userPublicId;
+        this.accountId = accountId;
         this.amount = amount;
     }
 
@@ -25,7 +29,7 @@ public class Payment {
     public String toString() {
         return "Payment{" +
                 "billingCycleId=" + billingCycleId +
-                ", userPublicId=" + userPublicId +
+                ", accountId=" + accountId +
                 '}';
     }
 }

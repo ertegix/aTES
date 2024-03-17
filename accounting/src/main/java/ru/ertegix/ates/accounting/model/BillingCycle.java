@@ -22,15 +22,15 @@ public class BillingCycle implements Serializable {
     private Long id;
 
     @Column(nullable = false)
-    private UUID userPublicId;
+    private Long accountId;
     private LocalDate startDate;
     private LocalDate endDate;
     private Boolean closed = false;
     @OneToMany(mappedBy = "billingCycle", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private final List<Transaction> transactions = new ArrayList<>();
 
-    public BillingCycle(Period period, UUID userPublicId) {
-        this.userPublicId = userPublicId;
+    public BillingCycle(Period period, Account account) {
+        this.accountId = account.getId();
         this.startDate = LocalDate.now();
         this.endDate = startDate.plusDays(period.getDays());
     }

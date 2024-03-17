@@ -20,13 +20,18 @@
           "type": {
             "type": "string",
             "avro.java.string": "String"
-          }
-        },
+          }        },
         { "name": "userPublicId",
           "type": {
             "type": "string",
             "avro.java.string": "String"
           }
-        }
+        },
+       { "name": "eventDateTime",
+         "type": {
+           "type": "string",
+           "avro.java.string": "String"
+         }
+       }
      ]
 }

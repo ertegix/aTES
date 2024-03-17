@@ -1,21 +1,23 @@
-package ru.ertegix.ates.queue;
+package ru.ertegix.ates.accounting.queue;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
 @Component
+@Slf4j
 @AllArgsConstructor
-public class MessageSender {
+public class QueueMessageSender {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void sendMessage(Object event, String topic) {
+    public <T> void sendPrice(ru.ertegix.ates.event.PricesEvent_v1 pricesEventV1) {
         kafkaTemplate.send(
-                topic,
+                TopicNames.PRICES_TOPIC_NAME,
                 UUID.randomUUID().toString(),
-                event);
+                pricesEventV1);
     }
 }

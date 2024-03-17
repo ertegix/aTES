@@ -5,14 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-import ru.ertegix.ates.accounting.model.BillingCycle;
-import ru.ertegix.ates.accounting.model.Task;
-import ru.ertegix.ates.accounting.model.Transaction;
-import ru.ertegix.ates.accounting.model.User;
+import ru.ertegix.ates.accounting.model.*;
+import ru.ertegix.ates.accounting.repo.AccountRepository;
 import ru.ertegix.ates.accounting.repo.BillingCycleRepository;
 import ru.ertegix.ates.accounting.repo.TaskRepository;
 import ru.ertegix.ates.common.Status;
 import ru.ertegix.ates.common.TaskBeEventType;
+import ru.ertegix.ates.event.PricesEvent_v1;
 import ru.ertegix.ates.event.TaskBusinessEvent_v1;
 import ru.ertegix.ates.accounting.repo.UserRepository;
 import ru.ertegix.ates.common.Role;
@@ -29,8 +28,11 @@ import static ru.ertegix.ates.accounting.queue.TopicNames.*;
 @Component
 public class Consumer {
 
+    private final QueueMessageSender messageSender;
+
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final BillingCycleRepository billingCycleRepository;
 
     @KafkaListener(topics = USER_STREAM_TOPIC_NAME)
@@ -176,12 +178,23 @@ public class Consumer {
                 description,
                 status);
         taskRepository.saveAndFlush(task);
+        messageSender.sendPrice(new PricesEvent_v1(
+                task.getTaskPublicId().toString(),
+                task.getCompletionReward(),
+                task.getAssignCost()
+        ));
         return task;
     }
 
     private void addTransactionToUsersAccount(UUID userPublicId, Task task, boolean income) {
-        Optional<BillingCycle> billingCycle = billingCycleRepository.findActualByUserPublicId(
-                userPublicId, LocalDate.now()
+        Account userAccount = accountRepository.findByUserPublicId(userPublicId)
+                .orElseGet(() -> {
+                    User newUser = new User(userPublicId, "<UNKNOWN>", Role.UNKNOWN);
+                    userRepository.saveAndFlush(newUser);
+                    return newUser.getAccount();
+                });
+        Optional<BillingCycle> billingCycle = billingCycleRepository.findActualByAccountId(
+                userAccount.getId(), LocalDate.now()
         );
 
         if (billingCycle.isPresent()) {
@@ -192,10 +205,20 @@ public class Consumer {
             updating.getTransactions().add(newTransaction);
             billingCycleRepository.saveAndFlush(updating);
         } else {
-            BillingCycle newBillingCycle = new BillingCycle(
-                    Period.ofDays(1),
-                    userPublicId
-            );
+            Optional<Account> account = accountRepository.findByUserPublicId(userPublicId);
+            BillingCycle newBillingCycle;
+            if (account.isPresent()) {
+                newBillingCycle = new BillingCycle(
+                        Period.ofDays(1),
+                        account.get()
+                );
+            } else {
+                User newUser = new User(userPublicId, "<UNKNOWN>", Role.UNKNOWN);
+                userRepository.saveAndFlush(newUser);
+                Account newAccount = newUser.getAccount();
+                newBillingCycle = new BillingCycle(Period.ofDays(1), newAccount);
+            }
+
             Transaction newTransaction = income
                     ? Transaction.income(newBillingCycle, task)
                     : Transaction.outcome(newBillingCycle, task);

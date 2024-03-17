@@ -2,8 +2,11 @@ package ru.ertegix.ates.tasktracker.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.ertegix.ates.common.Role;
 import ru.ertegix.ates.event.TaskBusinessEvent_v1;
 import ru.ertegix.ates.event.TaskEvent_v1;
@@ -17,9 +20,12 @@ import ru.ertegix.ates.tasktracker.repo.TaskRepository;
 import org.springframework.http.MediaType;
 import ru.ertegix.ates.tasktracker.repo.UserRepository;
 import ru.ertegix.ates.tasktracker.request.CreateTaskRequest;
+import ru.ertegix.ates.tasktracker.security.JwtUser;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -40,9 +46,19 @@ public class TaskController {
     }
 
     @PreAuthorize("hasAuthority('WORKER') or hasAuthority('ADMIN')")
-    @GetMapping("/myTasks/{id}")
-    public @ResponseBody List<Task> getWorkersTasks(@PathVariable String id) {
-        return taskRepository.findAllByUserPublicId(UUID.fromString(id));
+    @GetMapping("/myTasks")
+    public @ResponseBody List<Task> getWorkersTasks(Authentication authentication)
+    {
+        UUID userPublicId = ((JwtUser) authentication.getPrincipal()).getPublicId();
+        if (userPublicId == null) {
+            String username = ((JwtUser) authentication.getPrincipal()).getUsername();
+            Optional<User> user = userRepository.findByUsername(username);
+            if (user.isPresent()) {
+                userPublicId = user.get().getPublicId();
+            }
+        }
+
+        return taskRepository.findAllByUserPublicId(userPublicId);
     }
 
 
@@ -50,6 +66,9 @@ public class TaskController {
     @PostMapping("/create")
     public @ResponseBody Task createTask(@RequestBody CreateTaskRequest request) {
         User user = userRepository.getRandomUser();
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There are no users found");
+        }
         Task task = new Task(
                 user.getPublicId(),
                 request.getDescription(),
@@ -67,7 +86,8 @@ public class TaskController {
                                 TaskBeEventType.CREATED.name(),
                                 task.getTaskPublicId().toString(),
                                 task.getDescription(),
-                                task.getUserPublicId().toString()
+                                task.getUserPublicId().toString(),
+                                LocalDateTime.now().toString()
                         )
                 )
         );
@@ -92,14 +112,15 @@ public class TaskController {
                                     TaskBeEventType.ASSIGNED.name(),
                                     task.getTaskPublicId().toString(),
                                     task.getDescription(),
-                                    task.getUserPublicId().toString()
+                                    task.getUserPublicId().toString(),
+                                    LocalDateTime.now().toString()
                             )
                     )
             );
         }
     }
 
-    @PreAuthorize("hasAuthority('MANAGER')")
+    @PreAuthorize("hasAnyAuthority('WORKER')")
     @PutMapping("/complete/{id}")
     public void completeTask(@PathVariable String id) {
         Optional<Task> task = taskRepository.findByTaskPublicId(UUID.fromString(id));
@@ -115,13 +136,16 @@ public class TaskController {
                                     TaskBeEventType.COMPLETED.name(),
                                     foundTask.getTaskPublicId().toString(),
                                     foundTask.getDescription(),
-                                    foundTask.getUserPublicId().toString()
+                                    foundTask.getUserPublicId().toString(),
+                                    LocalDateTime.now().toString()
                             )
                     )
             );
         }
     }
 
+
+    // todo remove later
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/allUsers")
     public List<User> users() {

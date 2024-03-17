@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import ru.ertegix.ates.accounting.email.EmailService;
+import ru.ertegix.ates.accounting.model.Account;
 import ru.ertegix.ates.accounting.model.BillingCycle;
 import ru.ertegix.ates.accounting.model.Payment;
 import ru.ertegix.ates.accounting.model.User;
+import ru.ertegix.ates.accounting.repo.AccountRepository;
 import ru.ertegix.ates.accounting.repo.BillingCycleRepository;
 import ru.ertegix.ates.accounting.repo.PaymentRepository;
 import ru.ertegix.ates.accounting.repo.UserRepository;
@@ -19,23 +21,22 @@ import java.util.Optional;
 @Component
 public class BillingCyclesProcessor {
 
-
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final BillingCycleRepository billingCycleRepository;
     private final PaymentRepository paymentRepository;
     private final EmailService emailService;
 
-    @Scheduled(fixedRate = 1000 * 60 * 1L)
+    @Scheduled(fixedRate = 1000 * 60 * 5L)
     public void process() {
         List<BillingCycle> cycles = billingCycleRepository.findAllByClosed(false);
 
         for (BillingCycle billingCycle: cycles) {
             if (billingCycle.isEnded()) {
-                int balance = billingCycle.processTransactions();
+                long balance = billingCycle.processTransactions();
                 if (balance > 0) {
                     Payment payment = new Payment(
                             billingCycle.getId(),
-                            billingCycle.getUserPublicId(),
+                            billingCycle.getAccountId(),
                             balance
                     );
                     paymentRepository.saveAndFlush(payment);
@@ -43,12 +44,11 @@ public class BillingCyclesProcessor {
                     billingCycleRepository.saveAndFlush(billingCycle);
                     emailService.sentPaymentInfoToUser(payment);
                 }
-                Optional<User> user = userRepository.findByPublicId(billingCycle.getUserPublicId());
-                if (user.isPresent()) {
-                    User foundUser = user.get();
-                    int newBalance = foundUser.getBalance() + balance;
-                    foundUser.setBalance(newBalance);
-                    userRepository.saveAndFlush(foundUser);
+                Optional<Account> userAccount = accountRepository.findById(billingCycle.getAccountId());
+                if (userAccount.isPresent()) {
+                    Account account = userAccount.get();
+                    account.addToBalance(balance);
+                    accountRepository.saveAndFlush(account);
                 }
             }
         }

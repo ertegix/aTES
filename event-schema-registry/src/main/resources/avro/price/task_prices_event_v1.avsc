@@ -1,0 +1,20 @@
+{
+     "type": "record",
+     "namespace": "ru.ertegix.ates.event",
+     "name": "PricesEvent_v1",
+     "version": "1",
+     "fields": [
+        { "name": "taskPublicId",
+          "type": {
+            "type": "string",
+            "avro.java.string": "String"
+          }
+        },
+        { "name": "completionReward",
+          "type": "long"
+        },
+        { "name": "assignmentCost",
+          "type": "long"
+        }
+     ]
+}

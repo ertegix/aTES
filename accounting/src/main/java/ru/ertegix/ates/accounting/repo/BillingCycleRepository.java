@@ -8,17 +8,14 @@ import ru.ertegix.ates.accounting.model.BillingCycle;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface BillingCycleRepository extends JpaRepository<BillingCycle, Long> {
 
-    List<BillingCycle> findAllByUserPublicId(UUID userPublicId);
-
     List<BillingCycle> findAllByClosed(Boolean closed);
 
-    @Query(value = "select b from BillingCycle b where b.userPublicId = :userPublicId" +
+    @Query(value = "select b from BillingCycle b where b.accountId = :accountId" +
             " and b.startDate <= :date and b.endDate >= :date")
-    Optional<BillingCycle> findActualByUserPublicId(
-            @Param("userPublicId") UUID userPublicId,
+    Optional<BillingCycle> findActualByAccountId(
+            @Param("accountId") Long userPublicId,
             @Param("date") LocalDate date);
 }
